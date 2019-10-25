@@ -1,5 +1,6 @@
-library ieee;
-use ieee.all;
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
 
 entity fb_fsm_tb is
 end entity;
@@ -16,10 +17,9 @@ architecture test of fb_fsm_tb is
 	signal ch3_data_in : std_logic_vector(79 downto 0) := (others=>'0');
 	signal ch4_data_in : std_logic_vector(79 downto 0) := (others=>'0');
 	signal data_valid_in : std_logic := '0';
-	signal out_data 	: std_logic_vector(MAX_CYCLES*3 -1 downto 0);
+	signal out_data 	: std_logic_vector(MAX_CYCLES*NUM_DATA_CHANNELS -1 downto 0);
 	signal data_valid_out : std_logic;
 	signal data_valid_in_check : std_logic;
-	signal data_check : unsigned((MAX_CYCLES*NUM_DATA_CHANNELS - 1) downto 0);
 	signal index_check : integer;
 	
 	component fb_fsm
@@ -28,11 +28,11 @@ architecture test of fb_fsm_tb is
 	);
 	port(
 		--IN/OUT
-		data_out 			: out unsigned((MAX_CYCLES*3 - 1) downto 0);
-		ch1_in  			: in  unsigned(79 downto 0);
-		ch2_in  			: in  unsigned(79 downto 0);
-		ch3_in  			: in  unsigned(79 downto 0);
-		ch4_in  			: in  unsigned(79 downto 0);
+		data_out 			: out std_logic_vector((MAX_CYCLES*NUM_DATA_CHANNELS - 1) downto 0);
+		ch1_in  			: in  std_logic_vector(79 downto 0);
+		ch2_in  			: in  std_logic_vector(79 downto 0);
+		ch3_in  			: in  std_logic_vector(79 downto 0);
+		ch4_in  			: in  std_logic_vector(79 downto 0);
 		data_valid_out    	: out std_logic;
 		clk      			: in  std_logic;
 		rst      			: in  std_logic;
@@ -41,8 +41,7 @@ architecture test of fb_fsm_tb is
 		
 		--FOR TESTING PURPOSES
 		data_valid_in_check				: out std_logic;
-		index_check 		: out integer;
-		data_check 			: out unsigned((MAX_CYCLES*3 - 1) downto 0)
+		index_check 		: out integer
 	);
 	end component;
 
@@ -63,8 +62,7 @@ begin
 
 		--FOR TESTING PURPOSES
 		data_valid_in_check		=> data_valid_in_check,
-		index_check 	=> index_check,
-		data_check 		=> data_check	
+		index_check 	=> index_check
 	);
 	
 	Mclk_process : process
@@ -77,7 +75,9 @@ begin
 	
 	stimulus : process
 	begin
-		wait for 10 ms;
+		wait for 100 ns;
+		
+		wait until Mclk = '1';
 		
 		-- TEST CASE 1:
 		rst <= '0';
@@ -87,26 +87,27 @@ begin
 		ch3_data_in <= (others=> '0');
 		ch4_data_in <= (others=> '0');
 		wait for 10 ns;
-		ch1_data_in <= (others=> x"120A");
-		ch2_data_in <= (others=> x"30D4");
-		ch3_data_in <= (others=> x"28AA");
-		ch4_data_in <= (others=> x"1211");
+		ch1_data_in <= x"0000_0000_0000_0000_120A";
+		ch2_data_in <= x"0000_0000_0000_0000_30D4";
+		ch3_data_in <= x"0000_0000_0000_0000_28AA";
+		ch4_data_in <= x"0000_0000_0000_0000_1211";
 		wait for 10 ns;
-		ch1_data_in <= (others=> x"1234");
-		ch2_data_in <= (others=> x"3214");
-		ch3_data_in <= (others=> x"0032");
-		ch4_data_in <= (others=> x"0121");
+		ch1_data_in <= x"0000_0000_0000_0000_1234";
+		ch2_data_in <= x"0000_0000_0000_0000_3214";
+		ch3_data_in <= x"0000_0000_0000_0000_0032";
+		ch4_data_in <= x"0000_0000_0000_0000_0121";
 		wait for 10 ns;
-		ch1_data_in <= (others=> x"0032");
-		ch2_data_in <= (others=> x"3214");
-		ch3_data_in <= (others=> x"0032");
-		ch4_data_in <= (others=> x"0121");
+		ch1_data_in <= x"0000_0000_0000_0000_0032";
+		ch2_data_in <= x"0000_0000_0000_0000_3214";
+		ch3_data_in <= x"0000_0000_0000_0000_0032";
+		ch4_data_in <= x"0000_0000_0000_0000_0121";
 		wait for 10 ns;
-		ch1_data_in <= (others=> x"0032");
-		ch2_data_in <= (others=> x"3214");
-		ch3_data_in <= (others=> x"1234");
-		ch4_data_in <= (others=> x"1234");		
-
+		ch1_data_in <= x"0000_0000_0000_0000_0032";
+		ch2_data_in <= x"0000_0000_0000_0000_3214";
+		ch3_data_in <= x"0000_0000_0000_0000_1234";
+		ch4_data_in <= x"0000_0000_0000_0000_1234";		
+        wait for 10 ns;
+        
 		-- TEST CASE 2:
 		rst <= '1';
 		data_valid_in <= '0';
@@ -122,58 +123,59 @@ begin
 		ch3_data_in <= (others=> '0');
 		ch4_data_in <= (others=> '0');
 		wait for 10 ns;
-		ch1_data_in <= (others=> x"120A");
-		ch2_data_in <= (others=> x"30D4");
-		ch3_data_in <= (others=> x"28AA");
-		ch4_data_in <= (others=> x"1211");
+		ch1_data_in <= x"0000_0000_0000_0000_120A";
+		ch2_data_in <= x"0000_0000_0000_0000_30D4";
+		ch3_data_in <= x"0000_0000_0000_0000_28AA";
+		ch4_data_in <= x"0000_0000_0000_0000_1211";
 		wait for 10 ns;
-		ch1_data_in <= (others=> x"1234");
-		ch2_data_in <= (others=> x"3214");
-		ch3_data_in <= (others=> x"0032");
-		ch4_data_in <= (others=> x"0121");
+		ch1_data_in <= x"0000_0000_0000_0000_1234";
+		ch2_data_in <= x"0000_0000_0000_0000_3214";
+		ch3_data_in <= x"0000_0000_0000_0000_0032";
+		ch4_data_in <= x"0000_0000_0000_0000_0121";
 		wait for 10 ns;
-		ch1_data_in <= (others=> x"0032");
-		ch2_data_in <= (others=> x"3214");
-		ch3_data_in <= (others=> x"0032");
-		ch4_data_in <= (others=> x"0121");
+		ch1_data_in <= x"0000_0000_0000_0000_0032";
+		ch2_data_in <= x"0000_0000_0000_0000_3214";
+		ch3_data_in <= x"0000_0000_0000_0000_0032";
+		ch4_data_in <= x"0000_0000_0000_0000_0121";
 		wait for 10 ns;
-		ch1_data_in <= (others=> x"0032");
-		ch2_data_in <= (others=> x"3214");
-		ch3_data_in <= (others=> x"1234");
-		ch4_data_in <= (others=> x"1234");	
+		ch1_data_in <= x"0000_0000_0000_0000_0032";
+		ch2_data_in <= x"0000_0000_0000_0000_3214";
+		ch3_data_in <= x"0000_0000_0000_0000_1234";
+		ch4_data_in <= x"0000_0000_0000_0000_1234";	
 		wait for 10 ns;
-		ch1_data_in <= (others=> x"120A");
-		ch2_data_in <= (others=> x"30D4");
-		ch3_data_in <= (others=> x"28AA");
-		ch4_data_in <= (others=> x"1211");
+		ch1_data_in <= x"0000_0000_0000_0000_120A";
+		ch2_data_in <= x"0000_0000_0000_0000_30D4";
+		ch3_data_in <= x"0000_0000_0000_0000_28AA";
+		ch4_data_in <= x"0000_0000_0000_0000_1211";
 		wait for 10 ns;
-		ch1_data_in <= (others=> x"1234");
-		ch2_data_in <= (others=> x"3214");
-		ch3_data_in <= (others=> x"0032");
-		ch4_data_in <= (others=> x"0121");
+		ch1_data_in <= x"0000_0000_0000_0000_1234";
+		ch2_data_in <= x"0000_0000_0000_0000_3214";
+		ch3_data_in <= x"0000_0000_0000_0000_0032";
+		ch4_data_in <= x"0000_0000_0000_0000_0121";
 		wait for 10 ns;
-		ch1_data_in <= (others=> x"0032");
-		ch2_data_in <= (others=> x"3214");
-		ch3_data_in <= (others=> x"0032");
-		ch4_data_in <= (others=> x"0121");
+		ch1_data_in <= x"0000_0000_0000_0000_0032";
+		ch2_data_in <= x"0000_0000_0000_0000_3214";
+		ch3_data_in <= x"0000_0000_0000_0000_0032";
+		ch4_data_in <= x"0000_0000_0000_0000_0121";
 		wait for 10 ns;
-		ch1_data_in <= (others=> x"0032");
-		ch2_data_in <= (others=> x"3214");
-		ch3_data_in <= (others=> x"1234");
-		ch4_data_in <= (others=> x"1234");	
+		ch1_data_in <= x"0000_0000_0000_0000_0032";
+		ch2_data_in <= x"0000_0000_0000_0000_3214";
+		ch3_data_in <= x"0000_0000_0000_0000_1234";
+		ch4_data_in <= x"0000_0000_0000_0000_1234";	
 		wait for 10 ns;
-		ch1_data_in <= (others=> x"120A");
-		ch2_data_in <= (others=> x"30D4");
-		ch3_data_in <= (others=> x"28AA");
-		ch4_data_in <= (others=> x"1211");
+		ch1_data_in <= x"0000_0000_0000_0000_120A";
+		ch2_data_in <= x"0000_0000_0000_0000_30D4";
+		ch3_data_in <= x"0000_0000_0000_0000_28AA";
+		ch4_data_in <= x"0000_0000_0000_0000_1211";
+		wait for 10 ns;
 		
 		-- TEST CASE 3:
 		rst <= '1';
 		data_valid_in <= '0';
-		ch1_data_in <= (others=> '0');
-		ch2_data_in <= (others=> '0');
-		ch3_data_in <= (others=> '0');
-		ch4_data_in <= (others=> '0');
+		ch1_data_in <= (others=>'0');
+		ch2_data_in <= (others=>'0');
+		ch3_data_in <= (others=>'0');
+		ch4_data_in <= (others=>'0');
 		wait for 10 ns;
 		rst <= '0';
 		data_valid_in <= '1';
@@ -182,58 +184,59 @@ begin
 		ch3_data_in <= (others=> '0');
 		ch4_data_in <= (others=> '0');
 		wait for 10 ns;
-		ch1_data_in <= (others=> x"120A");
-		ch2_data_in <= (others=> x"30D4");
-		ch3_data_in <= (others=> x"28AA");
-		ch4_data_in <= (others=> x"1211");
+		ch1_data_in <= x"0000_0000_0000_0000_120A";
+		ch2_data_in <= x"0000_0000_0000_0000_30D4";
+		ch3_data_in <= x"0000_0000_0000_0000_28AA";
+		ch4_data_in <= x"0000_0000_0000_0000_1211";
 		wait for 10 ns;
 		data_valid_in <= '0';
-		ch1_data_in <= (others=> x"1234");
-		ch2_data_in <= (others=> x"3214");
-		ch3_data_in <= (others=> x"0032");
-		ch4_data_in <= (others=> x"0121");
+		ch1_data_in <= x"0000_0000_0000_0000_1234";
+		ch2_data_in <= x"0000_0000_0000_0000_3214";
+		ch3_data_in <= x"0000_0000_0000_0000_0032";
+		ch4_data_in <= x"0000_0000_0000_0000_0121";
 		wait for 10 ns;
 		data_valid_in <= '1';
-		ch1_data_in <= (others=> x"0032");
-		ch2_data_in <= (others=> x"3214");
-		ch3_data_in <= (others=> x"0032");
-		ch4_data_in <= (others=> x"0121");
+		ch1_data_in <= x"0000_0000_0000_0000_0032";
+		ch2_data_in <= x"0000_0000_0000_0000_3214";
+		ch3_data_in <= x"0000_0000_0000_0000_0032";
+		ch4_data_in <= x"0000_0000_0000_0000_0121";
 		wait for 10 ns;
 		data_valid_in <= '0';
-		ch1_data_in <= (others=> x"0032");
-		ch2_data_in <= (others=> x"3214");
-		ch3_data_in <= (others=> x"1234");
-		ch4_data_in <= (others=> x"1234");	
+		ch1_data_in <= x"0000_0000_0000_0000_0032";
+		ch2_data_in <= x"0000_0000_0000_0000_3214";
+		ch3_data_in <= x"0000_0000_0000_0000_1234";
+		ch4_data_in <= x"0000_0000_0000_0000_1234";	
 		wait for 10 ns;
 		data_valid_in <= '0';
-		ch1_data_in <= (others=> x"120A");
-		ch2_data_in <= (others=> x"30D4");
-		ch3_data_in <= (others=> x"28AA");
-		ch4_data_in <= (others=> x"1211");
+		ch1_data_in <= x"0000_0000_0000_0000_120A";
+		ch2_data_in <= x"0000_0000_0000_0000_30D4";
+		ch3_data_in <= x"0000_0000_0000_0000_28AA";
+		ch4_data_in <= x"0000_0000_0000_0000_1211";
 		wait for 10 ns;
 		data_valid_in <= '1';
-		ch1_data_in <= (others=> x"1234");
-		ch2_data_in <= (others=> x"3214");
-		ch3_data_in <= (others=> x"0032");
-		ch4_data_in <= (others=> x"0121");
+		ch1_data_in <= x"0000_0000_0000_0000_1234";
+		ch2_data_in <= x"0000_0000_0000_0000_3214";
+		ch3_data_in <= x"0000_0000_0000_0000_0032";
+		ch4_data_in <= x"0000_0000_0000_0000_0121";
 		wait for 10 ns;
 		data_valid_in <= '1';
-		ch1_data_in <= (others=> x"0032");
-		ch2_data_in <= (others=> x"3214");
-		ch3_data_in <= (others=> x"0032");
-		ch4_data_in <= (others=> x"0121");
+		ch1_data_in <= x"0000_0000_0000_0000_0032";
+		ch2_data_in <= x"0000_0000_0000_0000_3214";
+		ch3_data_in <= x"0000_0000_0000_0000_0032";
+		ch4_data_in <= x"0000_0000_0000_0000_0121";
 		wait for 10 ns;
 		data_valid_in <= '1';
-		ch1_data_in <= (others=> x"0032");
-		ch2_data_in <= (others=> x"3214");
-		ch3_data_in <= (others=> x"1234");
-		ch4_data_in <= (others=> x"1234");	
+		ch1_data_in <= x"0000_0000_0000_0000_0032";
+		ch2_data_in <= x"0000_0000_0000_0000_3214";
+		ch3_data_in <= x"0000_0000_0000_0000_1234";
+		ch4_data_in <= x"0000_0000_0000_0000_1234";	
 		wait for 10 ns;
 		data_valid_in <= '0';
-		ch1_data_in <= (others=> x"120A");
-		ch2_data_in <= (others=> x"30D4");
-		ch3_data_in <= (others=> x"28AA");
-		ch4_data_in <= (others=> x"1211");
+		ch1_data_in <= x"0000_0000_0000_0000_120A";
+		ch2_data_in <= x"0000_0000_0000_0000_30D4";
+		ch3_data_in <= x"0000_0000_0000_0000_28AA";
+		ch4_data_in <= x"0000_0000_0000_0000_1211";
+		wait for 10 ns;
 		
 		wait;
 		
